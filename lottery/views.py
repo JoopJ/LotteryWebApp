@@ -4,11 +4,13 @@ import logging
 from flask import Blueprint, render_template, request, flash
 
 from app import db
-from models import Draw
+from models import Draw, User
 
 # CONFIG
 lottery_blueprint = Blueprint('lottery', __name__, template_folder='templates')
 
+user = User.query.first()
+draw_key = user.draw_key
 
 # VIEWS
 # view lottery page
@@ -25,7 +27,7 @@ def add_draw():
     submitted_draw.strip()
 
     # create a new draw with the form data.
-    new_draw = Draw(user_id=1, draw=submitted_draw, win=False, round=0)  # TODO: update user_id [user_id=1 is a placeholder]
+    new_draw = Draw(user_id=1, draw=submitted_draw, win=False, round=0)  # TODO: update user_id [user_id=1 is a placeholder], add user draw_key to parameters
 
     # add the new draw to the database
     db.session.add(new_draw)

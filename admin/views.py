@@ -46,7 +46,7 @@ def create_winning_draw():
     submitted_draw.strip()
 
     # create a new draw object with the form data.
-    new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round)
+    new_winning_draw = Draw(user_id=0, draw=submitted_draw, win=True, round=round) # TODO: Add draw_key to parameters
 
     # add the new winning draw to the database
     db.session.add(new_winning_draw)

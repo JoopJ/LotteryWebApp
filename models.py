@@ -10,6 +10,9 @@ from app import db
 def encrypt(data, draw_key):
     return Fernet(draw_key).encrypt(bytes(data, 'utf-8'))
 
+def decrypt(data, draw_key):
+    return Fernet(draw_key).decrypt(data).decode("utf-8")
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
@@ -69,6 +72,9 @@ class Draw(db.Model):
         self.match = False
         self.win = win
         self.round = round
+
+    def view_draw(self, draw_key):
+        self.draw = decrypt(self.draw, draw_key)
 
 
 def init_db():

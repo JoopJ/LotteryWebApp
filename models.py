@@ -3,7 +3,7 @@ from datetime import datetime
 from Crypto.Protocol.KDF import scrypt
 from Crypto.Random import get_random_bytes
 from cryptography.fernet import Fernet
-from flask_login import UserMixin
+from flask_login import UserMixin, LoginManager
 from werkzeug.security import generate_password_hash
 from app import db
 
@@ -24,7 +24,7 @@ class User(db.Model, UserMixin):
     pin_key = db.Column(db.String(100), nullable=False)
 
     # User activity information
-    registered_on = db.Column(db.DateTime, nullable=True)
+    registered_on = db.Column(db.DateTime, nullable=False)
     last_logged_in = db.Column(db.DateTime, nullable=True)
     current_logged_in = db.Column(db.DateTime, nullable=True)
 

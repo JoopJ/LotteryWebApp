@@ -35,6 +35,6 @@ class RegisterForm(FlaskForm):
             raise ValidationError("Password must contain at least 1 digit, 1 lowercase, 1 uppercase and 1 special character")
 
 class LoginForm(FlaskForm):
-    username = StringField(validators=[Required(), Email()])
+    email = StringField(validators=[Required(), Email()])
     password = PasswordField(validators=[Required()])
     submit = SubmitField()

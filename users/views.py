@@ -4,7 +4,7 @@ import pyotp
 from datetime import datetime
 from functools import wraps
 
-from flask import Blueprint, render_template, flash, redirect, url_for, request
+from flask import Blueprint, render_template, flash, redirect, url_for, session
 from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash
 
@@ -55,18 +55,43 @@ def register():
 # view user login
 @users_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
+
+    # if session attribute logins does not exist create attribute logins
+    if not session.get('logins'):
+        session['logins'] = 0
+    # if login attempts is 3 or more create an error message
+    elif session.get('logins') >=3 :
+        flash('Number of incorrent logins exceeded')
+
     form = LoginForm()
 
     if form.validate_on_submit():
+
+        # increase login attempts by 1
+        session['logins'] += 1
+
         # gets the user by their email
         user = User.query.filter_by(email=form.email.data).first()
 
         # check that a valid username was entered and the correct password was entered
         if not user or not check_password_hash(user.password, form.password.data):
-            flash('Please check your login details and try again')
+
+            #if no match create appropriate error message based on login attempts
+            if session['logins'] == 3:
+                flash('Number of incorrect logins exceeded')
+            elif session['logins'] == 2:
+                flash('Please check your login details and try again. 1 login attempt remaining')
+            else:
+                flash('Please check your login details and try again. 2 login attempt remaining')
+
             return render_template('login.html', form=form)
 
+        # attempt to verify the provided OTP
         if pyotp.TOTP(user.pin_key).verify(form.pin.data):
+
+            # if user is verified reset login attempts to 0
+            session['logins'] = 0
+
             # login user with Login Manager
             login_user(user)
 

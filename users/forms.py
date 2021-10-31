@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import Required, Email, Length, EqualTo, ValidationError
 
-
+# name excluded character validation
 def nameCharacterCheck(form, field):
     excluded_chars = "*?!'^+%&/()=}][{$#@<>"
     for char in field.data:
@@ -24,11 +24,13 @@ class RegisterForm(FlaskForm):
     pin_key = StringField(validators=[Required(), Length(min=32, max=32, message="Pin Key must be exactly 32 characters in length")])
     submit = SubmitField()
 
+    # phone number format validation
     def validate_phone(self, phone):
         p = re.compile(r'(\d{4}-\d{3}-\d{4})')
         if not p.match(self.phone.data):
             raise ValidationError("Phone must be in the format XXXX-XXX-XXXX")
 
+    # password required characters validation
     def validate_password(self, password):
         p = re.compile(r'(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[*?!\'^+%&/()=}\]\[{$#@<>])')
         if not p.match(self.password.data):
@@ -37,4 +39,5 @@ class RegisterForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = StringField(validators=[Required(), Email()])
     password = PasswordField(validators=[Required()])
+    pin = StringField(validators=[Required()])
     submit = SubmitField()

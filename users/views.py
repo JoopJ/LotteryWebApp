@@ -8,7 +8,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for, session,
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 
-from app import db
+from app import db, requires_roles
 from models import User
 from users.forms import RegisterForm, LoginForm
 
@@ -107,7 +107,12 @@ def login():
 
             logging.warning('SECURITY - Log in [%s, %s, %s]', current_user.id, current_user.email, request.remote_addr)
 
-            return profile()
+            # direct to role appropriate page
+            if current_user.role == 'admin':
+                return redirect(url_for('admin.admin'))
+            else:
+                return request(url_for('users.profile'))
+
         else:
             flash("You have supplied an invalid 2FA token", "danger")
 
@@ -117,6 +122,7 @@ def login():
 # view user profile
 @users_blueprint.route('/profile')
 @login_required
+@requires_roles('user')
 def profile():
     return render_template('profile.html', name=current_user.firstname + " " + current_user.lastname)
 

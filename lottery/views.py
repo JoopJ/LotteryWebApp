@@ -4,7 +4,7 @@ import copy
 from flask import Blueprint, render_template, request, flash
 from flask_login import login_required, current_user
 
-from app import db
+from app import db, requires_roles
 from models import Draw, User
 
 # CONFIG

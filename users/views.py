@@ -5,7 +5,7 @@ from datetime import datetime
 from functools import wraps
 
 from flask import Blueprint, render_template, flash, redirect, url_for, session
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 
 from app import db
@@ -112,7 +112,7 @@ def login():
 @users_blueprint.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', name="PLACEHOLDER FOR FIRSTNAME")
+    return render_template('profile.html', name=current_user.firstname + " " + current_user.lastname)
 
 
 # view user account
@@ -120,11 +120,11 @@ def profile():
 @login_required
 def account():
     return render_template('account.html',
-                           acc_no="PLACEHOLDER FOR USER ID",
-                           email="PLACEHOLDER FOR USER EMAIL",
-                           firstname="PLACEHOLDER FOR USER FIRSTNAME",
-                           lastname="PLACEHOLDER FOR USER LASTNAME",
-                           phone="PLACEHOLDER FOR USER PHONE")
+                           acc_no=current_user.id,
+                           email=current_user.email,
+                           firstname=current_user.firstname,
+                           lastname=current_user.lastname,
+                           phone=current_user.phone)
 
 # logout the currently logged in user
 @users_blueprint.route('/logout')

@@ -4,7 +4,7 @@ import pyotp
 from datetime import datetime
 from functools import wraps
 
-from flask import Blueprint, render_template, flash, redirect, url_for, session
+from flask import Blueprint, render_template, flash, redirect, url_for, session, request
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 
@@ -46,6 +46,8 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        logging.warning('SECURITY - User registration [%s, %s]', form.email.data, request.remote_addr)
+
         # sends user to login page
         return redirect(url_for('users.login'))
     # if request method is GET or form not valid re-render signup page
@@ -76,6 +78,8 @@ def login():
         # check that a valid username was entered and the correct password was entered
         if not user or not check_password_hash(user.password, form.password.data):
 
+            logging.warning('SECURITY - Invalid login attempt [%s, %s]', form.email.data, request.remote_addr)
+
             #if no match create appropriate error message based on login attempts
             if session['logins'] == 3:
                 flash('Number of incorrect logins exceeded')
@@ -100,6 +104,8 @@ def login():
             user.current_logged_in = datetime.now()
             db.session.add(user)
             db.session.commit()
+
+            logging.warning('SECURITY - Log in [%s, %s, %s]', current_user.id, current_user.email, request.remote_addr)
 
             return profile()
         else:
@@ -130,6 +136,8 @@ def account():
 @users_blueprint.route('/logout')
 @login_required
 def logout():
-    print("logged out")
+    
+    logging.warning('SECURITY - Log out [%s, %s, %s]', current_user.id, current_user.email, request.remote_addr)
+    
     logout_user()
     return redirect(url_for('index'))

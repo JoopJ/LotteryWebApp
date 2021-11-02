@@ -29,7 +29,7 @@ def add_draw():
     submitted_draw.strip()
 
     # create a new draw with the form data.
-    new_draw = Draw(current_user.draw_key, draw=submitted_draw, win=False, round=0)
+    new_draw = Draw(user_id=current_user.id, draw=submitted_draw, win=False, round=0, draw_key=current_user.draw_key)
 
     # add the new draw to the database
     db.session.add(new_draw)
@@ -46,7 +46,7 @@ def add_draw():
 @requires_roles('user')
 def view_draws():
     # get all draws that have not been played [played=0]
-    playable_draws = Draw.query.filter_by(username=current_user.username, played=False).all()
+    playable_draws = Draw.query.filter_by(user_id=current_user.id, played=False).all()
 
     # if playable draws exist
     if len(playable_draws) != 0:
@@ -56,7 +56,7 @@ def view_draws():
         decrypted_draws = []
         # decrypt each copied draw object and add it to decrypted_draws array.
         for d in draw_copies:
-            user = User.query.filter_by(username=d.username).first()
+            user = User.query.filter_by(id=d.user_id).first()
             d.view_draw(user.draw_key)
             decrypted_draws.append(d)
 
@@ -73,7 +73,7 @@ def view_draws():
 @requires_roles('user')
 def check_draws():
     # get played draws
-    played_draws = Draw.query.filter_by(username=current_user.username).all()
+    played_draws = Draw.query.filter_by(user_id=current_user.id).all()
 
     # if played draws exist
     if len(played_draws) != 0:
@@ -90,7 +90,7 @@ def check_draws():
 @login_required
 @requires_roles('user')
 def play_again():
-    delete_played = Draw.__table__.delete().where(username=current_user.username)
+    delete_played = Draw.__table__.delete().where(Draw.played and Draw.user_id==current_user.id)
     db.session.execute(delete_played)
     db.session.commit()
 

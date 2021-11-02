@@ -111,7 +111,7 @@ def login():
             if current_user.role == 'admin':
                 return redirect(url_for('admin.admin'))
             else:
-                return request(url_for('users.profile'))
+                return redirect(url_for('users.profile'))
 
         else:
             flash("You have supplied an invalid 2FA token", "danger")

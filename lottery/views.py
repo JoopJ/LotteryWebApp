@@ -74,10 +74,17 @@ def view_draws():
 def check_draws():
     # get played draws
     played_draws = Draw.query.filter_by(user_id=current_user.id).all()
+    # empty list for decrypted coppied draw objects
+    decrypted_draws = []
+    # decrypt each copied draw object and add it to decrypted_draws array.
+    for d in played_draws:
+        user = User.query.filter_by(id=d.user_id).first()
+        d.view_draw(user.draw_key)
+        decrypted_draws.append(d)
 
     # if played draws exist
     if len(played_draws) != 0:
-        return render_template('lottery.html', results=played_draws, played=True)
+        return render_template('lottery.html', results=decrypted_draws, played=True)
 
     # if no played draws exist [all draw entries have been played therefore wait for next lottery round]
     else:
